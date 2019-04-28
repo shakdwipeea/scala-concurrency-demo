@@ -33,7 +33,7 @@ class PageActor (persistence: ActorRef @@ Persistence) (implicit mat: ActorMater
   def request(pageRequest: PageRequest) (implicit mat: ActorMaterializer,
     ec: ExecutionContext, actorSystem: ActorSystem) {
     Http()
-      .singleRequest(HttpRequest(uri = "https://www.reddit.com/r/clojure.json"))
+      .singleRequest(HttpRequest(uri = pageRequest.linkData.url))
       .filter { response => response.status == StatusCodes.OK }
       .flatMap { response =>
         Unmarshal(response)
@@ -47,7 +47,7 @@ class PageActor (persistence: ActorRef @@ Persistence) (implicit mat: ActorMater
 
   def receive = {
     case pr @ PageRequest(sub, linkData) => request(pr)
-    case pd @ PageData(_, _, _) => println(s"page data got for ${pd.linkData.title}")
+    case pd @ PageData(_, _, _) => persistence ! pd
     case a => println(s"unknown message $a")
   }
 }

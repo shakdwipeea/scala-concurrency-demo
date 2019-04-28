@@ -14,7 +14,11 @@ object AkkaQuickstart extends App with ActorModule {
   implicit val ec: ExecutionContext = system.dispatcher
   implicit val mat: ActorMaterializer = ActorMaterializer()
 
-  reddit ! FetchReddit("clojure")
+  List("clojure", "haskell", "scala", "javascript", "erlang",
+    "elixir", "common_lisp", "sports", "soccer")
+    .foreach { sub =>
+      reddit ! FetchReddit(sub)
+    }
   //#main-send-messages
 }
 //#main-class

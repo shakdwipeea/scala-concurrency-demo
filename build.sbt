@@ -15,7 +15,8 @@ libraryDependencies ++= Seq(
   "com.softwaremill.macwire" %% "macros" % "2.3.2" % "provided",
   "com.softwaremill.macwire" %% "macrosakka" % "2.3.2" % "provided",
   "com.softwaremill.macwire" %% "util" % "2.3.2",
-   "com.softwaremill.common" %% "tagging" % "2.2.1",
+  "com.softwaremill.common" %% "tagging" % "2.2.1",
+  "org.apache.commons" % "commons-text" % "1.6",
   "net.debasishg" %% "redisreact" % "0.9",
   "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 )

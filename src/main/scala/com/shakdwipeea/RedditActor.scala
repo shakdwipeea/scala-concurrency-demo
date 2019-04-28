@@ -50,7 +50,7 @@ class RedditDispatch (pageActor: ActorRef @@ Page) (implicit mat: ActorMateriali
   def request(sub: String) (implicit mat: ActorMaterializer,
     ec: ExecutionContext, actorSystem: ActorSystem) {
     Http()
-      .singleRequest(HttpRequest(uri = "https://www.reddit.com/r/clojure.json"))
+      .singleRequest(HttpRequest(uri = s"https://www.reddit.com/r/$sub.json"))
       .filter { response => response.status == StatusCodes.OK }
       .flatMap { response =>
         Unmarshal(response)
