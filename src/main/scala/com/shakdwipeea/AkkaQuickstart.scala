@@ -2,6 +2,8 @@
 package com.shakdwipeea
 
 import akka.actor.{ Actor, ActorLogging, ActorRef, ActorSystem, Props }
+import akka.stream.ActorMaterializer
+import scala.concurrent.ExecutionContext
 
 //#greeter-companion
 //#greeter-messages
@@ -56,11 +58,15 @@ class Printer extends Actor with ActorLogging {
 //#printer-actor
 
 //#main-class
-object AkkaQuickstart extends App {
+object AkkaQuickstart extends App with SubredditModule {
+  import RedditDispatch._
+
   import Greeter._
 
   // Create the 'helloAkka' actor system
-  val system: ActorSystem = ActorSystem("helloAkka")
+  implicit val system: ActorSystem = ActorSystem("helloAkka")
+  implicit val ec: ExecutionContext = system.dispatcher
+  implicit val mat: ActorMaterializer = ActorMaterializer()
 
   //#create-actors
   // Create the printer actor
@@ -73,6 +79,8 @@ object AkkaQuickstart extends App {
     system.actorOf(Greeter.props("Hello", printer), "helloGreeter")
   val goodDayGreeter: ActorRef =
     system.actorOf(Greeter.props("Good day", printer), "goodDayGreeter")
+
+  val redditDispatch = createRedditDispatch
   //#create-actors
 
   //#main-send-messages
@@ -87,6 +95,8 @@ object AkkaQuickstart extends App {
 
   goodDayGreeter ! WhoToGreet("Play")
   goodDayGreeter ! Greet
+
+  redditDispatch ! FetchReddit("clojure")
   //#main-send-messages
 }
 //#main-class
