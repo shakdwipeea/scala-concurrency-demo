@@ -6,7 +6,7 @@ import akka.stream.ActorMaterializer
 import scala.concurrent.ExecutionContext
 
 //#main-class
-object AkkaQuickstart extends App with SubredditModule {
+object AkkaQuickstart extends App with ActorModule {
   import RedditDispatch._
 
   // Create the 'helloAkka' actor system
@@ -14,8 +14,7 @@ object AkkaQuickstart extends App with SubredditModule {
   implicit val ec: ExecutionContext = system.dispatcher
   implicit val mat: ActorMaterializer = ActorMaterializer()
 
-  val redditDispatch = createRedditDispatch
-  redditDispatch ! FetchReddit("clojure")
+  reddit ! FetchReddit("clojure")
   //#main-send-messages
 }
 //#main-class

@@ -1,6 +1,6 @@
 package com.shakdwipeea
 
-import akka.actor.{ Actor, ActorLogging, ActorSystem, Props }
+import akka.actor.{ Actor, ActorLogging, ActorRef, ActorSystem, Props }
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
@@ -14,6 +14,9 @@ import spray.json.JsObject
 import akka.stream.ActorMaterializer
 import spray.json.DefaultJsonProtocol._
 import com.softwaremill.macwire._
+import com.softwaremill.tagging._
+import com.softwaremill.macwire.akkasupport._
+
 import akka.pattern.pipe
 
 object RedditDispatch {
@@ -38,9 +41,10 @@ object RedditJsonProtocol extends DefaultJsonProtocol {
   implicit val redditFormat = jsonFormat1(RedditFormat)
 }
 
-class RedditDispatch (implicit mat: ActorMaterializer,
+class RedditDispatch (pageActor: ActorRef @@ Page) (implicit mat: ActorMaterializer,
   ec: ExecutionContext, actorSystem: ActorSystem) extends Actor with ActorLogging {
   import RedditDispatch._
+  import PageActor._
   import RedditJsonProtocol._
 
   def request(sub: String) (implicit mat: ActorMaterializer,
@@ -62,16 +66,10 @@ class RedditDispatch (implicit mat: ActorMaterializer,
     case FetchReddit(sub) => request(sub)
 
     case RedditLinks(sub, links) =>
-      println(s"sub is $sub and links are $links")
+      links
+        .map(l => PageRequest(sub, l))
+        .foreach { pageReq => pageActor ! pageReq }
 
     case a => println(s"Unknow msg $a")
   }
-}
-
-trait SubredditModule {
-  def createRedditDispatch = system.actorOf(Props(wire[RedditDispatch]))
-
-  implicit val system: ActorSystem
-  implicit val mat: ActorMaterializer
-  implicit val ec: ExecutionContext
 }
